@@ -1,8 +1,3 @@
-//+------------------------------------------------------------------+
-//|                                                     MGHelper.mqh |
-//|                                    Copyright 2015, Moritz Göckel |
-//|                                    https://www.moritzgoeckel.com |
-//+------------------------------------------------------------------+
 #property copyright "Copyright 2015, Moritz Göckel"
 #property link      "https://www.moritzgoeckel.com"
 
@@ -23,7 +18,7 @@ class MGHelper
       ~MGHelper();
       void closePositions();
       void getMA(ENUM_TIMEFRAMES timeframe, int ma_peroid, int count, double& array[]);
-      double normalize(double value);
+      double normalizePrice(double value);
       double normalizeVolume(double value);
       double calculateVolume(double Entry, double SL, double Percent);
       void trade(bool buy, double sl, double tp);
@@ -54,7 +49,7 @@ void MGHelper::getMA(ENUM_TIMEFRAMES timeframe, int ma_peroid, int count, double
    CopyBuffer(handle, 0, 0, count, array);
 }
 
-double MGHelper::normalize(double value){
+double MGHelper::normalizePrice(double value){
    long digits = SymbolInfoInteger(Symbol(), SYMBOL_DIGITS);
    return NormalizeDouble(value, (int)digits);
 }
@@ -70,7 +65,7 @@ double MGHelper::normalizeVolume(double value)
    if(value > max)
       value = max;
    
-   //value = MathRound(value / step) * step;
+   value = MathRound(value / step) * step;
    
    if(step >= 0.1)
       value = NormalizeDouble(value, 1);
@@ -99,8 +94,8 @@ double MGHelper::calculateVolume(double Entry, double SL, double Percent) {
 void MGHelper::trade(bool buy, double sl, double tp)
 {
       //Normalize Pries
-      sl = normalize(sl);
-      tp = normalize(tp);
+      sl = normalizePrice(sl);
+      tp = normalizePrice(tp);
 
       double price;
       if(buy)
@@ -159,8 +154,8 @@ void MGHelper::trade(bool buy, double sl, double tp)
       SLTPrequest.sl = sl;
       SLTPrequest.tp = tp;
       
-      //OrderSend(SLTPrequest, SLTPresult);
-      //Print("SLTP: " + SLTPresult.retcode + " -> " + SLTPresult.comment);
+      OrderSend(SLTPrequest, SLTPresult);
+      Print("Open Order: " + SLTPresult.retcode + " -> " + SLTPresult.comment);
 }
 
 string MGHelper::orderToString(MqlTradeRequest &request){
